@@ -6,7 +6,7 @@ From the mgua00 kickstart repo https://github.com/mgua/kickstart.nvim.git
 
 ## installation instructions
 ```
-ansible-playbook site.yaml  --ask-become-pass
+ansible-playbook site.yml  --ask-become-pass
 ```
-and input your root password
+and input your sudo password
 
