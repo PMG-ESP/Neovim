@@ -129,12 +129,12 @@
 - name: Clone the kickstart nvim repo
   ansible.builtin.git:
     repo: https://github.com/mgua/kickstart.nvim.git
-    dest: /home/{{ remore_user }}/.config/nvim
+    dest: /home/{{ nvim_user }}/.config/nvim
 
 - name: Change ownership of the cloned folder
   ansible.builtin.file:
-    path: /home/{{ remore_user }}/.config/nvim
+    path: /home/{{ nvim_user }}/.config/nvim
     state: directory
-    owner: "{{ remore_user }}"
-    group: "{{ remore_user }}"
+    owner: "{{ nvim_user }}"
+    group: "{{ nvim_user }}"
     recurse: true

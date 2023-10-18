@@ -8,3 +8,5 @@
   become: true
   roles:
     - nvim
+  vars:
+    nvim_user: {{ lookup('env', USER) }}
