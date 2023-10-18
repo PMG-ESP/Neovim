@@ -1,0 +1,9 @@
+---
+# ---------------------------
+#   Main playbook file       |
+# ---------------------------
+
+- hosts: all
+  become: true
+  roles:
+    - nvim

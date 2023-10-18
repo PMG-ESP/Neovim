@@ -1,0 +1,140 @@
+# --------------------
+#   Install updates  |
+# --------------------
+- name: Update repository index
+  tags: always
+  ansible.builtin.dnf:
+    update_only: true
+    update_cache: true
+  when: ansible_distribution in ["Fedora","CentOS"]
+
+- name: Install updates (Ubuntu)
+  tags: always
+  ansible.builtin.apt:
+    update_cache: true
+  when: ansible_distribution in ["Ubuntu","Debian"]
+
+# -------------------------------------------------------------------------------------------
+#   prerequirements: ripgrep, fd-find, git, gcc, make, python3, python3-venv, python3-pip   |
+# -------------------------------------------------------------------------------------------
+
+- name: Install prerequirements
+  tags: prerequirements
+  ansible.builtin.dnf:
+    name:
+      - ripgrep
+      - fd-find
+      - git
+      - gcc
+      - make
+      - python3
+      - python3-pip
+    state: present
+  when: ansible_distribution in ["Fedora","CentOS"]
+
+- name: Install prerequirements
+  tags: prerequirements
+  ansible.builtin.apt:
+    name:
+      - ripgrep
+      - fd-find
+      - git
+      - gcc
+      - make
+      - python3
+      - python3-venv
+      - python3-pip
+    state: present
+  when: ansible_distribution in ["Ubuntu","Debian"]
+
+- name: Rename fdfind binary
+  ansible.builtin.file:
+    src: /usr/bin/fdfind
+    dest: /usr/bin/fd
+    state: link
+  when: ansible_distribution in ["Ubuntu","Debian"]
+
+# Install nodejs fedora
+- name: Install nodejs (Fedora)
+  tags: prerequirements, nodejs
+  ansible.builtin.dnf:
+    name: "@nodejs:16/common"
+    state: present
+  when: ansible_distribution in ["Fedora","CentOS"]
+
+# Install nodejs on ubuntu
+
+- name: Install node js prerequirements(Debian)
+  tags: prerequirements
+  vars:
+    - NODE_MAJOR: 16
+  when: ansible_distribution in ["Ubuntu","Debian"]
+  block:
+
+    - name: Ca-certificates, curl, gnupg
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+        state: present
+
+    - name: Download an import nodesource gpg key
+      ansible.builtin.apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+        keyring: /etc/apt/keyrings/nodesource.gpg
+
+    - name: Create deb repository
+      ansible.builtin.apt_repository:
+        repo: deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_{{ NODE_MAJOR }}.x nodistro main
+        state: present
+
+    - name: Update repo index and install nodejs
+      ansible.builtin.apt:
+        update_cache: true
+        name:
+          - nodejs
+        state: present
+
+
+# ---------------------------------
+#   Installing Neovim from source |
+# ---------------------------------
+
+- name: Check if the directory exist
+  ansible.builtin.file:
+    path: /tmp/neovim
+    state: absent
+
+- name: Install neovim
+  tags: neovim-install
+  ansible.builtin.unarchive:
+    src: https://github.com/neovim/neovim/releases/download/v0.9.2/nvim-linux64.tar.gz
+    dest: /usr/local/bin
+    remote_src: true
+    mode: "0755"
+
+- name: Create symlink
+  tags: neovim-install
+  ansible.builtin.file:
+    src: /usr/local/bin/nvim-linux64/bin/nvim
+    dest: /usr/local/bin/nvim
+    state: link
+    mode: "0755"
+
+# -------------------------
+#   Neovim configuration  |
+# -------------------------
+
+- name: Clone the kickstart nvim repo
+  ansible.builtin.git:
+    repo: https://github.com/mgua/kickstart.nvim.git
+    dest: /home/{{ remore_user }}/.config/nvim
+
+- name: Change ownership of the cloned folder
+  ansible.builtin.file:
+    path: /home/{{ remore_user }}/.config/nvim
+    state: directory
+    owner: "{{ remore_user }}"
+    group: "{{ remore_user }}"
+    recurse: true
