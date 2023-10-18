@@ -1,6 +1,11 @@
 # --------------------
 #   Install updates  |
 # --------------------
+- name: Debug
+  tags: debug
+  ansible.builtin.debug:
+    msg: "{{ lookup('ansible.builtin.env', 'USER') }}"
+
 - name: Update repository index
   tags: always
   ansible.builtin.dnf:
@@ -12,7 +17,7 @@
   tags: always
   ansible.builtin.apt:
     update_cache: true
-  when: ansible_distribution in ["Ubuntu","Debian"]
+  when: ansible_distribution in ["Ubuntu","Debian","Kali"]
 
 # -------------------------------------------------------------------------------------------
 #   prerequirements: ripgrep, fd-find, git, gcc, make, python3, python3-venv, python3-pip   |
@@ -45,14 +50,14 @@
       - python3-venv
       - python3-pip
     state: present
-  when: ansible_distribution in ["Ubuntu","Debian"]
+  when: ansible_distribution in ["Ubuntu","Debian","Kali"]
 
 - name: Rename fdfind binary
   ansible.builtin.file:
     src: /usr/bin/fdfind
     dest: /usr/bin/fd
     state: link
-  when: ansible_distribution in ["Ubuntu","Debian"]
+  when: ansible_distribution in ["Ubuntu","Debian","Kali"]
 
 # Install nodejs fedora
 - name: Install nodejs (Fedora)
@@ -68,7 +73,7 @@
   tags: prerequirements
   vars:
     - NODE_MAJOR: 16
-  when: ansible_distribution in ["Ubuntu","Debian"]
+  when: ansible_distribution in ["Ubuntu","Debian","Kali"]
   block:
 
     - name: Ca-certificates, curl, gnupg

@@ -9,4 +9,4 @@
   roles:
     - nvim
   vars:
-    nvim_user: "{{ lookup('env', USER) }}"
+    nvim_user: "{{ lookup('env', 'USER') }}"

@@ -4,5 +4,9 @@ From the mgua00 kickstart repo https://github.com/mgua/kickstart.nvim.git
 ## prerequirements
 - ansible installed
 
-## install instruction
-ansible-playbook site.yaml --become --ask-become-pass
+## installation instructions
+```
+ansible-playbook site.yaml  --ask-become-pass
+```
+and input your root password
+
